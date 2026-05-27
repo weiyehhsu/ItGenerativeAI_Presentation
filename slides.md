@@ -456,31 +456,6 @@ def build_sdxl_prompt(card):
 
 ---
 
-<div class="kicker">Next Steps</div>
-
-# 下一步：把現場使用變得更穩定
-
-<div class="cards cards-2">
-  <div class="panel">
-    <h3>離線展示資料</h3>
-    <p>準備固定回應與牌圖，外部 API 不穩時仍能完整走完使用者旅程。</p>
-  </div>
-  <div class="panel">
-    <h3>Health check 整理</h3>
-    <p>把服務狀態、模型設定與 image backend 狀態分開回報。</p>
-  </div>
-  <div class="panel">
-    <h3>自動化測試</h3>
-    <p>補上 guardrail category、draw route、admin stats 與前端狀態切換測試。</p>
-  </div>
-  <div class="panel">
-    <h3>部署管線</h3>
-    <p>將環境變數、build 流程與靜態素材交付方式整理成可重複流程。</p>
-  </div>
-</div>
-
----
-
 <div class="kicker">Takeaway</div>
 
 # AI 不是只產生答案，而是進入一個有邊界的體驗
