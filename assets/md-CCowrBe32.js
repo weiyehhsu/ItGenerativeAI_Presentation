@@ -1,8 +1,0 @@
-import{L as e,T as t,Y as n,_ as r,b as i,g as a,gt as o,mt as s,x as c}from"./modules/shiki-D2cVZWX-.js";import{nt as l,rt as u}from"./index-CyjZDhJz.js";import{t as d}from"./slidev/default-CKazuzRn.js";import{t as f}from"./slidev/CodeBlockWrapper-iufetZ4q.js";var p={class:`two-col code-pair`},m={__name:`slides.md__slidev_9`,setup(m){let{$slidev:h,$nav:g,$clicksContext:_,$clicks:v,$page:y,$renderContext:b,$frontmatter:x}=u();return _.setup(),(u,m)=>{let h=f;return e(),r(d,o(t(s(l)(s(x),8))),{default:n(()=>[m[2]||=a(`div`,{class:`kicker`},`Reading Generation`,-1),m[3]||=a(`h1`,null,`解讀模型吃的是結構化上下文`,-1),a(`div`,p,[m[1]||=a(`div`,{class:`panel tight`},[a(`h3`,null,`Prompt inputs`),a(`ul`,null,[a(`li`,null,`求問者生日`),a(`li`,null,`使用者問題`),a(`li`,null,`三張牌的位置、中文名、英文名與關鍵字`),a(`li`,null,`可由進階模式覆寫的 system prompt`)])],-1),a(`div`,null,[c(h,{title:``,ranges:[]},{default:n(()=>[...m[0]||=[a(`pre`,{class:`shiki shiki-themes vitesse-dark vitesse-light slidev-code`,style:{"--shiki-dark":`#dbd7caee`,"--shiki-light":`#393a34`,"--shiki-dark-bg":`#121212`,"--shiki-light-bg":`#ffffff`}},[a(`code`,{class:`language-txt`},[a(`span`,{class:`line`},[a(`span`,null,`請依以下結構解讀：`)]),i(`
-`),a(`span`,{class:`line`},[a(`span`,null,`1. 【整體脈絡】`)]),i(`
-`),a(`span`,{class:`line`},[a(`span`,null,`2. 【過去】`)]),i(`
-`),a(`span`,{class:`line`},[a(`span`,null,`3. 【現在】`)]),i(`
-`),a(`span`,{class:`line`},[a(`span`,null,`4. 【未來】`)]),i(`
-`),a(`span`,{class:`line`},[a(`span`,null,`5. 【塔羅師的建議】`)]),i(`
-`),a(`span`,{class:`line`},[a(`span`)]),i(`
-`),a(`span`,{class:`line`},[a(`span`,null,`請直接開始解讀，不要說「好的」。`)])])],-1)]]),_:1})])]),m[4]||=a(`div`,{class:`statement`},` 固定輸出格式讓模型的語氣仍然有彈性，但內容不會脫離塔羅解讀的結構。 `,-1)]),_:1},16)}}};export{m as default};
