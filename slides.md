@@ -76,14 +76,14 @@ fonts:
 
 # 生成式占卜的三個挑戰
 
-<div class="cards cards-3" style="margin-top: 100px;">
+<div class="cards cards-3" style="margin-top: 110px;">
   <div class="panel">
     <h3>個人化</h3>
     <p>塔羅不只是固定牌義查表，回應要能讀進使用者的問題、生日與三張牌的位置。</p>
   </div>
   <div class="panel">
     <h3>安全邊界</h3>
-    <p>輸入可能包含 prompt injection、越獄、暴力、自傷訊號或離題需求，需要先被分類。</p>
+    <p>輸入可能包含 Prompt Injection、越獄、暴力、自傷訊號或離題需求，需要先被分類。</p>
   </div>
   <div class="panel">
     <h3>等待體驗</h3>
@@ -122,9 +122,9 @@ flowchart LR
   <div class="arc-tag">FastAPI · async</div>
   <div class="arc-tag">uv · Python 3.13</div>
   <div class="arc-tag">OpenAI-compatible API</div>
-  <div class="arc-tag">HTTP MCP (官方 SDK)</div>
+  <div class="arc-tag">Streamable HTTP MCP</div>
   <div class="arc-tag">Vanilla JS + Lucide</div>
-  <div class="arc-tag">JSONL log</div>
+  <div class="arc-tag">JSONL Log</div>
 </div>
 
 </div>
@@ -138,14 +138,15 @@ flowchart LR
 <div class="two-col code-pair" style="margin-top: 70px;">
   <div class="panel tight">
     <h3>後端順序</h3>
-    <ol>
-      <li>讀取生日、問題與進階設定。</li>
-      <li>建立 guard model client，呼叫 <code>guard_classify()</code>。</li>
-      <li>把分類結果寫入 <code>attack_log.record()</code>。</li>
-      <li>不安全輸入回傳封印狀態。</li>
-      <li><code>crisis</code> 回傳關懷資源，不抽牌。</li>
-      <li><code>clean</code> 抽三張 Major Arcana，交給解讀模型。</li>
-      <li>建立 <code>job_id</code>，背景 thread 生成牌圖。</li>
+    <ol style="line-height: 1.75;">
+      <li style="margin-bottom: 0.7em;">收到使用者的生日、問題與進階設定。</li>
+      <li style="margin-bottom: 0.7em;">先送審查官，拿到八類安全標籤並寫進紀錄。</li>
+      <li style="margin-bottom: 0.7em;">依審查官提供的結果，有以下三種路徑：
+        <div style="margin-top: 0.5em;"><strong>A. 不安全</strong> → 封印頁</div>
+        <div style="margin-top: 0.35em;"><strong>B.  自殺 (<code>crisis</code>)</strong> → 求助資源</div>
+        <div style="margin-top: 0.35em;"><strong>C. 放行</strong></div>
+      </li>
+      <li>放行後抽三張 Major Arcana，交給占卜師解讀，並在背景啟動生圖。</li>
     </ol>
   </div>
   <div>
@@ -179,11 +180,11 @@ drawn = random.sample(MAJOR_ARCANA, 3)
 <div class="guard-grid" style="margin-top: 120px;">
   <div class="panel"><strong class="green">clean</strong><br><span class="mini">正常塔羅問題</span></div>
   <div class="panel"><strong>crisis</strong><br><span class="mini">自傷或自殺訊號</span></div>
-  <div class="panel"><strong class="red">prompt_injection</strong><br><span class="mini">要求忽略規則、抽 prompt</span></div>
-  <div class="panel"><strong class="red">jailbreak</strong><br><span class="mini">DAN / developer mode</span></div>
+  <div class="panel"><strong class="red">prompt_injection</strong><br><span class="mini">要求忽略規則、輸出 System Prompt</span></div>
+  <div class="panel"><strong class="red">jailbreak</strong><br><span class="mini">Admin / Developer Mode</span></div>
   <div class="panel"><strong class="red">nsfw</strong><br><span class="mini">色情或性暗示</span></div>
   <div class="panel"><strong class="red">violence</strong><br><span class="mini">武器或傷害他人</span></div>
-  <div class="panel"><strong class="red">off_topic</strong><br><span class="mini">寫 code、數學、翻譯等離題</span></div>
+  <div class="panel"><strong class="red">off_topic</strong><br><span class="mini">寫 Code、數學、翻譯等離題</span></div>
   <div class="panel"><strong class="red">minor_safety</strong><br><span class="mini">未成年與高風險主題</span></div>
 </div>
 
@@ -207,8 +208,8 @@ drawn = random.sample(MAJOR_ARCANA, 3)
     <h3>封印狀態保留三件事</h3>
     <ul>
       <li><strong>分類 Label：</strong>讓團隊知道被擋的原因。</li>
-      <li><strong>Reason：</strong>讓使用者理解界線，而不是只看到錯誤碼。</li>
-      <li><strong>Log 紀錄：</strong>但不持久化 API key。</li>
+      <li><strong>原因 Reason：</strong>讓使用者理解界線，而不是只看到錯誤碼。</li>
+      <li><strong>紀錄 Log：</strong>記錄在日誌當中，但不紀錄 API Key。</li>
     </ul>
   </div>
 </div>
@@ -222,10 +223,10 @@ drawn = random.sample(MAJOR_ARCANA, 3)
 <div class="split split-reverse" style="margin-top: 70px;">
   <div class="panel tight">
     <h3>為什麼 <code>crisis</code> 仍然是 <code>safe: true</code>？</h3>
-    <ul>
-      <li>自傷或自殺訊號不適合被冷冰冰地拒絕。</li>
-      <li>系統停止占卜流程，改給台灣求助資源。</li>
-      <li>這是 routing，不是一般內容封鎖。</li>
+    <ul style="line-height: 1.75;">
+      <li style="margin-bottom: 0.7em;">自傷或自殺訊號不適合被冷冰冰地拒絕。</li>
+      <li style="margin-bottom: 0.7em;">系統停止占卜流程，改給台灣求助資源。</li>
+      <li>這是 Routing，不是一般內容封鎖。</li>
     </ul>
   </div>
   <div>
@@ -239,14 +240,14 @@ drawn = random.sample(MAJOR_ARCANA, 3)
 
 # 解讀模型吃的是結構化上下文
 
-<div class="two-col code-pair" style="margin-top: 70px;">
+<div class="two-col code-pair" style="margin-top: 90px;">
   <div class="panel tight">
-    <h3>Prompt inputs</h3>
-    <ul>
-      <li>求問者生日</li>
-      <li>使用者問題</li>
-      <li>三張牌的位置、中英文名、<strong>正位/逆位</strong> 與對應關鍵字</li>
-      <li>可由進階模式覆寫的 system prompt（內含區分正逆位的指示）</li>
+    <h3>Prompt Inputs</h3>
+    <ul style="line-height: 1.75;">
+      <li style="margin-bottom: 0.7em;">求問者生日</li>
+      <li style="margin-bottom: 0.7em;">使用者問題</li>
+      <li style="margin-bottom: 0.7em;">三張牌的位置、中英文名、<strong>正位/逆位</strong> 與對應關鍵字</li>
+      <li>可由進階模式覆寫的 System Prompt（內含區分正逆位的指示）</li>
     </ul>
   </div>
   <div>
@@ -266,9 +267,9 @@ drawn = random.sample(MAJOR_ARCANA, 3)
   </div>
 </div>
 
-<div class="statement">
+<!--<div class="statement">
   每張牌 50/50 隨機正/逆位；逆位時 keywords 換成該牌的影子面，圖像在 UI 旋轉 180°，傳統塔羅做法。
-</div>
+</div>-->
 
 ---
 
@@ -300,10 +301,10 @@ drawn = random.sample(MAJOR_ARCANA, 3)
 <div class="two-col code-pair" style="margin-top: 100px;">
   <div class="panel tight">
     <h3><code>tarot/cards.py</code></h3>
-    <ul>
-      <li>22 張 Major Arcana。</li>
-      <li>每張牌有中英文名、關鍵字與 <code>imagery</code>。</li>
-      <li><code>STYLE_PREFIX</code> 統一 Art Nouveau、金色邊框與神祕氛圍。</li>
+    <ul style="line-height: 1.75;">
+      <li style="margin-bottom: 0.7em;">22 張 Major Arcana。</li>
+      <li style="margin-bottom: 0.7em;">每張牌有中英文名、關鍵字與 <code>imagery</code>。</li>
+      <li style="margin-bottom: 0.7em;"><code>STYLE_PREFIX</code> 統一生成的圖片美術風格，金色邊框與神祕氛圍。</li>
       <li><code>NEGATIVE_PROMPT</code> 控制 SFW 與畫質限制。</li>
     </ul>
   </div>
@@ -330,7 +331,7 @@ def build_sdxl_prompt(card):
 
 # 模型與後端可以在介面切換
 
-<div class="split" style="margin-top: 50px;">
+<div class="split" style="margin-top: 20px;">
   <div>
     <img src="./assets/screenshots/arcana-advanced.png" class="shot screen-md" />
   </div>
@@ -339,7 +340,12 @@ def build_sdxl_prompt(card):
     <ul style="line-height: 1.75;">
       <li style="margin-bottom: 0.6em;"><strong>Reading Model：</strong>Base URL、API Key、Model ID、System Prompt。</li>
       <li style="margin-bottom: 0.6em;"><strong>Guard Model：</strong>Base URL、API Key、Model ID。</li>
-      <li style="margin-bottom: 0.6em;"><strong>三種 Image Backend：</strong>A1111 / OpenAI <code>/images/generations</code> / OpenAI <code>/chat/completions</code> w/ <code>modalities</code>（Nano Banana 等）。</li>
+      <li style="margin-bottom: 0.6em;">
+        <strong>三種 Image Backend：</strong>
+        <div style="margin-top: 0.4em;">1. A1111</div>
+        <div style="margin-top: 0.3em;">2. OpenAI <code>/images/generations</code></div>
+        <div style="margin-top: 0.3em;">3. OpenAI <code>/chat/completions</code><br>w/ <code>modalities</code>（Nano Banana 等）。</div>
+      </li>
       <li><strong>MCP 工具：</strong>HTTP URL、Auth Header、逐工具勾選啟用。</li>
     </ul>
   </div>
@@ -354,21 +360,23 @@ def build_sdxl_prompt(card):
 <div class="cards cards-3" style="margin-top: 80px;">
   <div class="panel">
     <h3>A1111 SDXL</h3>
-    <p><code>/sdapi/v1/txt2img</code>。本地、可控、可掛 Lightning LoRA。支援 negative prompt 與 checkpoint 切換。</p>
+    <p><code>/sdapi/v1/txt2img</code><br><br>本地、可控、可掛 Lightning LoRA。<br><br>支援 Negative Prompt 與 Checkpoint 切換。</p>
   </div>
   <div class="panel">
-    <h3>OpenAI <code>/images/generations</code></h3>
-    <p>標準 OpenAI 圖像端點。預設 <code>gpt-image-1</code>。Azure / Together / Fireworks 同 schema。</p>
+    <h3>OpenAI <code>/images/generations</code></h3><br>
+    <p>標準 OpenAI 圖像端點。預設 <code>gpt-image-1</code>。<br><br>Azure / Together / Fireworks 同 schema。</p>
   </div>
   <div class="panel">
-    <h3>OpenAI <code>/chat/completions</code> w/ <code>modalities</code></h3>
-    <p>OpenRouter Nano Banana / Gemini 2.5 Flash Image 等。圖在 <code>choices[0].message.images[0].image_url.url</code>。</p>
+    <h3>OpenAI <code>/chat/completions</code><br>w/ <code>modalities</code></h3><br>
+    <p>OpenRouter Nano Banana / Gemini 2.5 Flash Image 等。
+        <!--圖在 <code>choices[0].message.images[0].image_url.url</code>。-->
+    </p>
   </div>
 </div>
 
-<div class="statement compact">
+<!--<div class="statement compact">
   共用同一個 <code>generate_image()</code> dispatcher。Creds fallback：UI 輸入 → <code>.env</code> → 寫死預設。預選 backend 由 <code>ARCANA_DEFAULT_IMAGE_BACKEND</code> 決定，可做到「沒裝 SDXL 也一鍵 demo」。
-</div>
+</div>-->
 
 ---
 
@@ -376,16 +384,14 @@ def build_sdxl_prompt(card):
 
 # HTTP MCP：占卜師會自己呼叫工具
 
-<div class="two-col code-pair">
+<div class="two-col code-pair" style="margin-top: 70px;">
   <div class="panel tight">
     <h3>流程</h3>
-    <ol>
-      <li>使用者在「MCP 工具」介面新增 Streamable HTTP MCP 伺服器，勾選要啟用的工具。</li>
-      <li>後端 <code>MCPSessionPool</code> 用官方 <code>mcp</code> SDK 建立並重用 session（sha256(auth_header) 作 key）。</li>
-      <li><code>TarotAgent</code> 把啟用工具加入 chat-completions 的 <code>tools</code>。</li>
-      <li>模型回 <code>tool_calls</code> → 並行 <code>asyncio.gather</code> 呼叫 → 結果回填 → loop。</li>
-      <li>最多 5 輪，失敗自動降級為純文字解讀。</li>
-      <li>每次呼叫寫入 <code>tool_trace</code>，前端在解讀文字下方以可展開區塊顯示 input / output。</li>
+    <ol style="line-height: 1.75;">
+      <li style="margin-bottom: 0.8em;">使用者在 UI 新增 MCP 伺服器、勾選想開放給占卜師的工具。</li>
+      <li style="margin-bottom: 0.8em;">後端連線並 <strong>重用 Session</strong>，省下每次的握手成本。</li>
+      <li style="margin-bottom: 0.8em;">占卜師收到可用工具，<strong>按需要呼叫</strong>，把結果融入解讀。</li>
+      <li>UI 在解讀下方展開顯示每次工具呼叫的 Input / Output。</li>
     </ol>
   </div>
   <div>
@@ -408,9 +414,9 @@ async with streamablehttp_client(
   </div>
 </div>
 
-<div class="statement compact">
+<!--<div class="statement compact">
   Auth header 不離開瀏覽器；工具列表與勾選狀態即時寫入 localStorage，重新整理立刻復原。
-</div>
+</div>-->
 
 ---
 
@@ -418,20 +424,20 @@ async with streamablehttp_client(
 
 # Scalar：互動式 API 文件
 
-<div class="two-col code-pair">
-  <div class="panel tight">
+<div class="two-col code-pair" style="margin-top: 70px;">
+  <div class="panel tight" style="margin-top: 35px;">
     <h3>三個出口</h3>
     <ul>
-      <li><code>/scalar</code> — Scalar 互動瀏覽器（dark mode、可直接打請求）</li>
-      <li><code>/docs</code> — Swagger UI（FastAPI 預設）</li>
-      <li><code>/openapi.json</code> — 規格本體，給外部 codegen 使用</li>
+      <li><code>/scalar</code>：Scalar 互動瀏覽器</li>
+      <li><code>/docs</code>：Swagger UI（FastAPI 預設）</li>
+      <li><code>/openapi.json</code>：規格本體，給外部 Codegen 使用</li>
     </ul>
-    <h3>怎麼設定</h3>
+    <!--<h3>怎麼設定</h3>
     <ul>
       <li>FastAPI 自帶 OpenAPI；Pydantic <code>Field(examples=...)</code> 自動成為 example。</li>
       <li>Tags 把 endpoints 分成 <code>tarot / mcp / admin / health</code> 群組。</li>
       <li>Scalar 從 <code>request.base_url</code> 推 server URL，反代後也可用。</li>
-    </ul>
+    </ul>-->
   </div>
   <div>
 
@@ -460,31 +466,33 @@ async def scalar_html(request: Request):
 
 # 哪些資料在哪邊：明確劃分
 
-<div class="cards cards-2">
+<div class="cards cards-2" style="margin-top: 25px;">
   <div class="panel">
     <h3>瀏覽器 localStorage</h3>
     <ul>
-      <li>使用者覆寫的 reading / guard / image API key、URL、model</li>
-      <li>MCP 伺服器 URL + auth header</li>
-      <li>系統 prompt 自訂</li>
+      <li>使用者覆寫的 Reading / Guard / Image API Key、URL、Model</li>
+      <li>MCP 伺服器 URL + Auth Header</li>
+      <li>系統 Prompt 自訂</li>
     </ul>
-    <p class="mini">隨請求送出，後端絕不寫入磁碟。</p>
+    <br>
+    <strong>隨請求送出，後端絕不寫入磁碟。</strong>
   </div>
   <div class="panel">
     <h3>後端 .env</h3>
     <ul>
-      <li>fallback：預設 LLM key、預設 model、SDXL URL</li>
-      <li>三種圖像 backend 各自的 base URL / key / model（含 cloud）</li>
-      <li><code>ARCANA_DEFAULT_IMAGE_BACKEND</code> 決定首次造訪的預選 backend</li>
-      <li>Server 設定：host / port / log level / tool-use 上限</li>
+      <li>Fallback：預設 LLM key、預設 Model、SDXL URL</li>
+      <li>三種圖像 Backend 各自的 Base URL / Key / Model（含 Cloud）</li>
+      <li><code>ARCANA_DEFAULT_IMAGE_BACKEND</code> 決定首次造訪的預選 Backend</li>
+      <li>Server 設定：Host / Port / Log Level / Tool-use 上限</li>
     </ul>
-    <p class="mini">填了 cloud key 就能做「沒裝 SDXL 也能一鍵 demo」。沒填則回到 UI 必須提供 credentials。</p>
+    <br>
+    <strong>填了 Cloud Key 就能做「沒裝 SDXL 也能一鍵 Demo」。<br><br>沒填則回到 UI 必須提供 Credentials。</strong>
   </div>
 </div>
 
-<div class="statement">
-  <strong>Key narrowing：</strong> 前端只送「當下選用的 image backend」的 credentials。選 A1111 時 OpenAI key 完全不離開瀏覽器。
-</div>
+<!--<div class="statement">
+  <strong>Key narrowing：</strong> 前端只送「當下選用的 Image Backend」的 Credentials。選 A1111 時 OpenAI Key 完全不離開瀏覽器。
+</div>-->
 
 ---
 
@@ -499,20 +507,20 @@ async def scalar_html(request: Request):
   <div class="stack">
     <div class="metric">
       <div class="n">JSONL</div>
-      <div>append-only attack log，重啟後載回最近 500 筆。</div>
+      <div>Append-only 攻擊紀錄，重啟後載回最近 500 筆。</div>
     </div>
     <div class="metric">
       <div class="n">2s</div>
-      <div>前端每 2 秒 polling stats 與 recent feed。</div>
+      <div>前端每 2 秒拉取狀態。</div>
     </div>
     <div class="metric">
-      <div class="n">0 key</div>
-      <div>log entry 不持久化 API key。</div>
+      <div class="n">No Key</div>
+      <div>Log 不紀錄 API key。</div>
     </div>
   </div>
 </div>
 
----
+<!-----
 
 <div class="kicker">Code Map</div>
 
@@ -543,7 +551,7 @@ async def scalar_html(request: Request):
 
 <div class="statement compact">
   FastAPI 負責決策與狀態，Vanilla JS 負責把狀態轉成儀式感，兩邊界線清楚。
-</div>
+</div>-->
 
 ---
 
@@ -606,16 +614,16 @@ async def scalar_html(request: Request):
     <p>審查模型失敗時放行，避免暫時性 API 問題讓正常問題全部被擋下。</p>
   </div>
   <div class="panel">
-    <h3>Key handling</h3>
-    <p>API key 存在瀏覽器 <code>localStorage</code>，只隨請求送到後端，不寫入 JSONL。</p>
+    <h3>Key Handling</h3>
+    <p>API Key 存在瀏覽器 <code>localStorage</code>，只隨請求送到後端，不寫入 JSONL。</p>
   </div>
   <div class="panel">
-    <h3>Crisis routing</h3>
+    <h3>Crisis Routing</h3>
     <p>自傷訊號不走封印，而是顯示專業協助資源，讓產品回應更符合情境。</p>
   </div>
   <div class="panel">
-    <h3>Prompt boundary</h3>
-    <p>Guard prompt 明確把使用者輸入視為待分類資料，降低 prompt injection 生效機率。</p>
+    <h3>Prompt Boundary</h3>
+    <p>Guard Prompt 明確把使用者輸入視為待分類資料，降低 Prompt Injection 生效機率。</p>
   </div>
 </div>
 
@@ -628,11 +636,11 @@ async def scalar_html(request: Request):
 <div class="cards cards-2" style="margin-top: 80px;">
   <div class="panel">
     <h3>輸入先被理解</h3>
-    <p>問題先經過 guardrail，再決定是封印、關懷路由或正常解讀。</p>
+    <p>問題先經過 Guardrail，再決定是封印、關懷路由或正常解讀。</p>
   </div>
   <div class="panel">
     <h3>模型可以替換</h3>
-    <p>Reading、Guard 與 Image backend 都透過介面設定，不綁死單一供應商。</p>
+    <p>Reading、Guard 與 Image Backend 都透過介面設定，不綁死單一供應商。</p>
   </div>
   <div class="panel">
     <h3>等待有敘事</h3>
@@ -640,7 +648,7 @@ async def scalar_html(request: Request):
   </div>
   <div class="panel">
     <h3>安全可觀察</h3>
-    <p>分類結果、攔截比例與最近紀錄都進入 admin 面板，方便團隊回看。</p>
+    <p>分類結果、攔截比例與最近紀錄都進入 Admin 面板，方便團隊回看。</p>
   </div>
 </div>
 
