@@ -1,8 +1,9 @@
 ---
-theme: seriph
+theme: default
 routerMode: hash
+base: /ItGenerativeAI_Presentation/
 title: AI塔羅 - Arcana Oraculum
-transition: slide-left
+transition: fade
 mdc: true
 colorSchema: dark
 drawings:
