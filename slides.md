@@ -1,5 +1,6 @@
 ---
 theme: seriph
+routerMode: hash
 title: AI塔羅 - Arcana Oraculum
 transition: slide-left
 mdc: true
