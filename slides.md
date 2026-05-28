@@ -577,7 +577,7 @@ async def scalar_html(request: Request):
     <span>連線 MCP 伺服器並回傳工具列表（前端 test/refresh 共用）</span>
   </div>
   <div class="api-card">
-    <strong>GET <code>/healthz</code></strong>
+    <strong>GET <code>/health</code></strong>
     <span>FastAPI 健康檢查（含 SDXL 連線狀態）</span>
   </div>
   <div class="api-card">
