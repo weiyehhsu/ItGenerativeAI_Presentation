@@ -50,7 +50,7 @@ fonts:
 
 # 從一個問題開始
 
-<div class="split split-home">
+<div class="split split-home" style="margin-top: 65px;">
   <div>
     <img src="./assets/screenshots/arcana-home.png" class="shot screen-lg" />
   </div>
@@ -76,7 +76,7 @@ fonts:
 
 # 生成式占卜的三個挑戰
 
-<div class="cards cards-3">
+<div class="cards cards-3" style="margin-top: 100px;">
   <div class="panel">
     <h3>個人化</h3>
     <p>塔羅不只是固定牌義查表，回應要能讀進使用者的問題、生日與三張牌的位置。</p>
@@ -100,6 +100,7 @@ fonts:
 <div class="kicker">Architecture</div>
 
 # 一個請求如何穿過系統
+<div style="margin-top: 70px;">
 
 ```mermaid
 flowchart LR
@@ -126,23 +127,25 @@ flowchart LR
   <div class="arc-tag">JSONL log</div>
 </div>
 
+</div>
+
 ---
 
 <div class="kicker">Request Lifecycle</div>
 
 # `/api/draw` 的決策路徑
 
-<div class="two-col code-pair">
+<div class="two-col code-pair" style="margin-top: 70px;">
   <div class="panel tight">
     <h3>後端順序</h3>
     <ol>
       <li>讀取生日、問題與進階設定。</li>
-      <li>建立 guard model client，呼叫 `guard_classify()`。</li>
-      <li>把分類結果寫入 `attack_log.record()`。</li>
+      <li>建立 guard model client，呼叫 <code>guard_classify()</code>。</li>
+      <li>把分類結果寫入 <code>attack_log.record()</code>。</li>
       <li>不安全輸入回傳封印狀態。</li>
-      <li>`crisis` 回傳關懷資源，不抽牌。</li>
-      <li>`clean` 抽三張 Major Arcana，交給解讀模型。</li>
-      <li>建立 `job_id`，背景 thread 生成牌圖。</li>
+      <li><code>crisis</code> 回傳關懷資源，不抽牌。</li>
+      <li><code>clean</code> 抽三張 Major Arcana，交給解讀模型。</li>
+      <li>建立 <code>job_id</code>，背景 thread 生成牌圖。</li>
     </ol>
   </div>
   <div>
@@ -173,7 +176,7 @@ drawn = random.sample(MAJOR_ARCANA, 3)
 
 # LLM-as-Guardrail：八類輸入分類
 
-<div class="guard-grid">
+<div class="guard-grid" style="margin-top: 120px;">
   <div class="panel"><strong class="green">clean</strong><br><span class="mini">正常塔羅問題</span></div>
   <div class="panel"><strong>crisis</strong><br><span class="mini">自傷或自殺訊號</span></div>
   <div class="panel"><strong class="red">prompt_injection</strong><br><span class="mini">要求忽略規則、抽 prompt</span></div>
@@ -184,11 +187,11 @@ drawn = random.sample(MAJOR_ARCANA, 3)
   <div class="panel"><strong class="red">minor_safety</strong><br><span class="mini">未成年與高風險主題</span></div>
 </div>
 
-<div class="panel note-panel">
+<!--<div class="panel note-panel">
   Guard prompt 明確要求模型把 <strong>user text 視為待分類資料</strong>，而不是要遵循的 instructions。
   審查失敗時採用 fail-open，降低正常使用被誤擋的機率。
   分類靠 <strong>forced tool call</strong>（<code>tool_choice="classify"</code>）拿結構化輸出，避開 <code>response_format</code> 在 Gemini 等供應商上被忽略的問題；再退到 json_schema / json_object / 純文字四層 fallback。
-</div>
+</div>-->
 
 ---
 
@@ -196,16 +199,16 @@ drawn = random.sample(MAJOR_ARCANA, 3)
 
 # 封印：把拒答做成產品語言
 
-<div class="split">
+<div class="split" style="margin-top: 70px;">
   <div>
     <img src="./assets/screenshots/arcana-blocked.png" class="shot screen-md" />
   </div>
   <div class="panel tight">
     <h3>封印狀態保留三件事</h3>
     <ul>
-      <li>分類 label，讓團隊知道被擋的原因。</li>
-      <li>reason，讓使用者理解界線，而不是只看到錯誤碼。</li>
-      <li>log 記錄，但不持久化 API key。</li>
+      <li><strong>分類 Label：</strong>讓團隊知道被擋的原因。</li>
+      <li><strong>Reason：</strong>讓使用者理解界線，而不是只看到錯誤碼。</li>
+      <li><strong>Log 紀錄：</strong>但不持久化 API key。</li>
     </ul>
   </div>
 </div>
@@ -216,9 +219,9 @@ drawn = random.sample(MAJOR_ARCANA, 3)
 
 # 危機訊號不封鎖，改成把牌放下
 
-<div class="split split-reverse">
+<div class="split split-reverse" style="margin-top: 70px;">
   <div class="panel tight">
-    <h3>為什麼 `crisis` 仍然是 `safe: true`？</h3>
+    <h3>為什麼 <code>crisis</code> 仍然是 <code>safe: true</code>？</h3>
     <ul>
       <li>自傷或自殺訊號不適合被冷冰冰地拒絕。</li>
       <li>系統停止占卜流程，改給台灣求助資源。</li>
@@ -236,7 +239,7 @@ drawn = random.sample(MAJOR_ARCANA, 3)
 
 # 解讀模型吃的是結構化上下文
 
-<div class="two-col code-pair">
+<div class="two-col code-pair" style="margin-top: 70px;">
   <div class="panel tight">
     <h3>Prompt inputs</h3>
     <ul>
@@ -273,16 +276,16 @@ drawn = random.sample(MAJOR_ARCANA, 3)
 
 # Lazy-flip：圖好，牌才翻
 
-<div class="split">
+<div class="split" style="margin-top: 70px;">
   <div>
     <img src="./assets/screenshots/arcana-reading.png" class="shot screen-md" />
   </div>
   <div class="panel tight">
     <h3>前端流程</h3>
     <ol>
-      <li>後端先回傳 `job_id`、三張牌與文字解讀。</li>
+      <li>後端先回傳 <code>job_id</code>、三張牌與文字解讀。</li>
       <li>前端顯示牌背與占卜師獨白。</li>
-      <li>每 1.5 秒呼叫 `/api/image/{job}/{idx}`。</li>
+      <li>每 1.5 秒呼叫 <code>/api/image/{job}/{idx}</code>。</li>
       <li>某張圖完成，才翻開那一張牌。</li>
     </ol>
   </div>
@@ -294,14 +297,14 @@ drawn = random.sample(MAJOR_ARCANA, 3)
 
 # 每張牌都有自己的圖像語彙
 
-<div class="two-col code-pair">
+<div class="two-col code-pair" style="margin-top: 100px;">
   <div class="panel tight">
-    <h3>`tarot_data.py`</h3>
+    <h3><code>tarot/cards.py</code></h3>
     <ul>
       <li>22 張 Major Arcana。</li>
-      <li>每張牌有中英文名、關鍵字與 `imagery`。</li>
-      <li>`STYLE_PREFIX` 統一 Art Nouveau、金色邊框與神祕氛圍。</li>
-      <li>`NEGATIVE_PROMPT` 控制 SFW 與畫質限制。</li>
+      <li>每張牌有中英文名、關鍵字與 <code>imagery</code>。</li>
+      <li><code>STYLE_PREFIX</code> 統一 Art Nouveau、金色邊框與神祕氛圍。</li>
+      <li><code>NEGATIVE_PROMPT</code> 控制 SFW 與畫質限制。</li>
     </ul>
   </div>
   <div>
@@ -327,17 +330,17 @@ def build_sdxl_prompt(card):
 
 # 模型與後端可以在介面切換
 
-<div class="split">
+<div class="split" style="margin-top: 50px;">
   <div>
     <img src="./assets/screenshots/arcana-advanced.png" class="shot screen-md" />
   </div>
   <div class="panel tight">
     <h3>可調參數（localStorage，無需重啟）</h3>
     <ul>
-      <li>Reading model：base URL、API key、model ID、system prompt。</li>
-      <li>Guard model：base URL、API key、model ID。</li>
-      <li>三種 image backend：A1111 / OpenAI <code>/images/generations</code> / OpenAI <code>/chat/completions</code> w/ <code>modalities</code>（Nano Banana 等）。</li>
-      <li>MCP 工具：HTTP URL、auth header、逐工具勾選啟用。</li>
+      <li><strong>Reading model：</strong>Base URL、API key、model ID、system prompt。</li>
+      <li><strong>Guard model：</strong>Base URL、API key、model ID。</li>
+      <li><strong>三種 Image Backend：</strong>A1111 / OpenAI <code>/images/generations</code> / OpenAI <code>/chat/completions</code> w/ <code>modalities</code>（Nano Banana 等）。</li>
+      <li><strong>MCP 工具：</strong>HTTP URL、auth header、逐工具勾選啟用。</li>
     </ul>
   </div>
 </div>
@@ -348,7 +351,7 @@ def build_sdxl_prompt(card):
 
 # 三種圖像 backend，同樣的介面
 
-<div class="cards cards-3">
+<div class="cards cards-3" style="margin-top: 80px;">
   <div class="panel">
     <h3>A1111 SDXL</h3>
     <p><code>/sdapi/v1/txt2img</code>。本地、可控、可掛 Lightning LoRA。支援 negative prompt 與 checkpoint 切換。</p>
@@ -489,7 +492,7 @@ async def scalar_html(request: Request):
 
 # 安全不是黑盒：每一次分類都可觀察
 
-<div class="split">
+<div class="split" style="margin-top: 70px;">
   <div>
     <img src="./assets/screenshots/arcana-admin.png" class="shot screen-md" />
   </div>
@@ -546,9 +549,9 @@ async def scalar_html(request: Request):
 
 <div class="kicker">API Surface</div>
 
-# 少量 endpoint 支撐完整流程
+# 少量 Endpoint 支撐完整流程
 
-<div class="api-grid">
+<div class="api-grid" style="margin-top: 55px;">
   <div class="api-card">
     <strong>GET <code>/</code></strong>
     <span>塔羅主畫面與互動入口</span>
@@ -597,14 +600,14 @@ async def scalar_html(request: Request):
 
 # 幾個值得說明的設計取捨
 
-<div class="cards cards-2">
+<div class="cards cards-2" style="margin-top: 80px;">
   <div class="panel">
     <h3>Fail-open</h3>
     <p>審查模型失敗時放行，避免暫時性 API 問題讓正常問題全部被擋下。</p>
   </div>
   <div class="panel">
     <h3>Key handling</h3>
-    <p>API key 存在瀏覽器 `localStorage`，只隨請求送到後端，不寫入 JSONL。</p>
+    <p>API key 存在瀏覽器 <code>localStorage</code>，只隨請求送到後端，不寫入 JSONL。</p>
   </div>
   <div class="panel">
     <h3>Crisis routing</h3>
@@ -622,7 +625,7 @@ async def scalar_html(request: Request):
 
 # AI 不是只產生答案，而是進入一個有邊界的體驗
 
-<div class="cards cards-2">
+<div class="cards cards-2" style="margin-top: 80px;">
   <div class="panel">
     <h3>輸入先被理解</h3>
     <p>問題先經過 guardrail，再決定是封印、關懷路由或正常解讀。</p>
