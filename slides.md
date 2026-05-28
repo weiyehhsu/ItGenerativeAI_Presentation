@@ -653,6 +653,31 @@ async def scalar_html(request: Request):
 </div>
 
 ---
+
+<div class="kicker">Team</div>
+
+# 小組分工
+
+<div class="two-col" style="margin-top: 90px;">
+  <div class="panel tight">
+    <h3>程式開發</h3>
+    <ul style="line-height: 1.85;">
+      <li style="margin-bottom: 0.5em;">109950026 李明謙</li>
+      <li>111550029 蔡奕庠</li>
+    </ul>
+  </div>
+  <div class="panel tight">
+    <h3>簡報製作</h3>
+    <ul style="line-height: 1.85;">
+      <li style="margin-bottom: 0.5em;">110550048 許維也</li>
+      <li style="margin-bottom: 0.5em;">112652030 呂泰廷</li>
+      <li style="margin-bottom: 0.5em;">0816132 蔡欣龍</li>
+      <li>112550026 林均澔</li>
+    </ul>
+  </div>
+</div>
+
+---
 layout: center
 ---
 
