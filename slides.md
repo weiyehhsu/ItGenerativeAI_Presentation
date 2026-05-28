@@ -363,7 +363,7 @@ def build_sdxl_prompt(card):
 </div>
 
 <div class="statement">
-  三種共用同一個 <code>generate_image(card, backend, opts, http)</code> dispatcher，前端只需切換 radio。
+  三種共用同一個 <code>generate_image(card, backend, opts, http)</code> dispatcher。Credentials fallback：<strong>UI 輸入 → <code>.env</code> 預設 → 寫死的安全預設</strong>。預選 backend 由 <code>ARCANA_DEFAULT_IMAGE_BACKEND</code> 決定，所以管理者可以做到「沒裝 SDXL 也一鍵 demo」。
 </div>
 
 ---
@@ -469,10 +469,12 @@ async def scalar_html(request: Request):
   <div class="panel">
     <h3>後端 .env</h3>
     <ul>
-      <li>啟動時讀一次的 fallback：預設 LLM key、預設 model、SDXL URL</li>
-      <li>Server-side 設定：host / port / log level / tool-use 上限</li>
+      <li>fallback：預設 LLM key、預設 model、SDXL URL</li>
+      <li>三種圖像 backend 各自的 base URL / key / model（含 cloud）</li>
+      <li><code>ARCANA_DEFAULT_IMAGE_BACKEND</code> 決定首次造訪的預選 backend</li>
+      <li>Server 設定：host / port / log level / tool-use 上限</li>
     </ul>
-    <p class="mini">沒填？UI 就必須提供完整 credentials；填了？UI 可以只填要覆寫的那幾格。</p>
+    <p class="mini">填了 cloud key 就能做「沒裝 SDXL 也能一鍵 demo」。沒填則回到 UI 必須提供 credentials。</p>
   </div>
 </div>
 
