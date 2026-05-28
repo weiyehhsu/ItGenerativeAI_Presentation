@@ -1,0 +1,9 @@
+import{_ as o}from"./slidev/CodeBlockWrapper.vue_vue_type_script_setup_true_lang-DJp_mRKz.js";import{W as p,g as u,aI as n,f as s,m as d,E as m,l,I as c,t as f,ad as a}from"./modules/vue-mPEFS9mP.js";import{I as g}from"./slidev/default-DDZROQHt.js";import{u as k,f as x}from"./slidev/context-DoUaoJB1.js";import"./modules/unplugin-icons-CZgMALoE.js";import"./index-DfWs57p2.js";import"./modules/shiki-DqdPIzAT.js";const G={__name:"slides.md__slidev_12",setup(b){const{$clicksContext:t,$frontmatter:i}=k();return t.setup(),(v,e)=>{const r=o;return p(),u(g,c(f(a(x)(a(i),11))),{default:n(()=>[e[1]||(e[1]=s("h1",null,"10. GitHub協作",-1)),e[2]||(e[2]=s("br",null,null,-1)),d(r,m({},{title:"",ranges:[]}),{default:n(()=>[...e[0]||(e[0]=[s("pre",{class:"shiki shiki-themes vitesse-dark vitesse-light slidev-code",style:{"--shiki-dark":"#dbd7caee","--shiki-light":"#393a34","--shiki-dark-bg":"#121212","--shiki-light-bg":"#ffffff"}},[s("code",{class:"language-txt"},[s("span",{class:"line"},[s("span",null,"Develop Feature")]),l(`
+`),s("span",{class:"line"},[s("span",null,"↓")]),l(`
+`),s("span",{class:"line"},[s("span",null,"Git Commit")]),l(`
+`),s("span",{class:"line"},[s("span",null,"↓")]),l(`
+`),s("span",{class:"line"},[s("span",null,"Push to GitHub")]),l(`
+`),s("span",{class:"line"},[s("span",null,"↓")]),l(`
+`),s("span",{class:"line"},[s("span",null,"Merge / Review")]),l(`
+`),s("span",{class:"line"},[s("span",null,"↓")]),l(`
+`),s("span",{class:"line"},[s("span",null,"Team Integration")])])],-1)])]),_:1},16),e[3]||(e[3]=s("br",null,null,-1)),e[4]||(e[4]=s("div",{class:"grid grid-cols-3 gap-4 mt-8"},[s("div",{class:"p-4 rounded-xl bg-blue-500/10 text-center"}," Version Control "),s("div",{class:"p-4 rounded-xl bg-green-500/10 text-center"}," Collaboration "),s("div",{class:"p-4 rounded-xl bg-purple-500/10 text-center"}," Backup ")],-1))]),_:1},16)}}};export{G as default};
