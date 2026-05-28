@@ -24,7 +24,7 @@ fonts:
 <div class="cover-grid">
   <div>
     <p class="lead">
-      一個把 <strong>OpenAI-compatible LLM</strong>、<strong>LLM-as-Guardrail</strong>、
+      一個把 <strong>OpenAI-compatible LLM</strong>、<strong>LLM-as-Guardrail</strong>、MCP、
       <strong>SDXL 圖像生成</strong> 與即時管理面板整合在一起的互動式塔羅網站。
     </p>
     <!--<div class="mini repo-line">
