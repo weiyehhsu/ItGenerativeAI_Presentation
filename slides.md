@@ -187,6 +187,7 @@ drawn = random.sample(MAJOR_ARCANA, 3)
 <div class="panel note-panel">
   Guard prompt 明確要求模型把 <strong>user text 視為待分類資料</strong>，而不是要遵循的 instructions。
   審查失敗時採用 fail-open，降低正常使用被誤擋的機率。
+  分類靠 <strong>forced tool call</strong>（<code>tool_choice="classify"</code>）拿結構化輸出，避開 <code>response_format</code> 在 Gemini 等供應商上被忽略的問題；再退到 json_schema / json_object / 純文字四層 fallback。
 </div>
 
 ---
@@ -375,11 +376,12 @@ def build_sdxl_prompt(card):
   <div class="panel tight">
     <h3>流程</h3>
     <ol>
-      <li>使用者在「MCP 工具」介面新增 Streamable HTTP MCP 伺服器。</li>
-      <li>後端 <code>MCPSessionPool</code> 用官方 <code>mcp</code> SDK 建立並重用 session。</li>
+      <li>使用者在「MCP 工具」介面新增 Streamable HTTP MCP 伺服器，勾選要啟用的工具。</li>
+      <li>後端 <code>MCPSessionPool</code> 用官方 <code>mcp</code> SDK 建立並重用 session（sha256(auth_header) 作 key）。</li>
       <li><code>TarotAgent</code> 把啟用工具加入 chat-completions 的 <code>tools</code>。</li>
       <li>模型回 <code>tool_calls</code> → 並行 <code>asyncio.gather</code> 呼叫 → 結果回填 → loop。</li>
       <li>最多 5 輪，失敗自動降級為純文字解讀。</li>
+      <li>每次呼叫寫入 <code>tool_trace</code>，前端在解讀文字下方以可展開區塊顯示 input / output。</li>
     </ol>
   </div>
   <div>
@@ -403,7 +405,7 @@ async with streamablehttp_client(
 </div>
 
 <div class="statement">
-  Auth header 只存在使用者瀏覽器，後端用 sha256 做 session pool key，不寫入磁碟。
+  Auth header 只存在使用者瀏覽器。工具勾選狀態與工具列表都即時持久化到 localStorage，重新整理頁面後立刻看到上次的工具，背景自動重新刷新。
 </div>
 
 ---
