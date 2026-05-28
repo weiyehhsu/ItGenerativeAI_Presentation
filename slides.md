@@ -408,6 +408,78 @@ async with streamablehttp_client(
 
 ---
 
+<div class="kicker">API Browser</div>
+
+# Scalar：互動式 API 文件
+
+<div class="two-col code-pair">
+  <div class="panel tight">
+    <h3>三個出口</h3>
+    <ul>
+      <li><code>/scalar</code> — Scalar 互動瀏覽器（dark mode、可直接打請求）</li>
+      <li><code>/docs</code> — Swagger UI（FastAPI 預設）</li>
+      <li><code>/openapi.json</code> — 規格本體，給外部 codegen 使用</li>
+    </ul>
+    <h3>怎麼設定</h3>
+    <ul>
+      <li>FastAPI 自帶 OpenAPI；Pydantic <code>Field(examples=...)</code> 自動成為 example。</li>
+      <li>Tags 把 endpoints 分成 <code>tarot / mcp / admin / health</code> 群組。</li>
+      <li>Scalar 從 <code>request.base_url</code> 推 server URL，反代後也可用。</li>
+    </ul>
+  </div>
+  <div>
+
+```python
+from scalar_fastapi import get_scalar_api_reference
+
+@app.get("/scalar", include_in_schema=False)
+async def scalar_html(request: Request):
+    base = str(request.base_url).rstrip("/")
+    return get_scalar_api_reference(
+        openapi_url=app.openapi_url,
+        title=f"{app.title} API",
+        dark_mode=True,
+        telemetry=False,
+        base_server_url=base,
+        servers=[{"url": base, "description": "Current host"}],
+    )
+```
+
+  </div>
+</div>
+
+---
+
+<div class="kicker">Client / Server Boundary</div>
+
+# 哪些資料在哪邊：明確劃分
+
+<div class="cards cards-2">
+  <div class="panel">
+    <h3>瀏覽器 localStorage</h3>
+    <ul>
+      <li>使用者覆寫的 reading / guard / image API key、URL、model</li>
+      <li>MCP 伺服器 URL + auth header</li>
+      <li>系統 prompt 自訂</li>
+    </ul>
+    <p class="mini">隨請求送出，後端絕不寫入磁碟。</p>
+  </div>
+  <div class="panel">
+    <h3>後端 .env</h3>
+    <ul>
+      <li>啟動時讀一次的 fallback：預設 LLM key、預設 model、SDXL URL</li>
+      <li>Server-side 設定：host / port / log level / tool-use 上限</li>
+    </ul>
+    <p class="mini">沒填？UI 就必須提供完整 credentials；填了？UI 可以只填要覆寫的那幾格。</p>
+  </div>
+</div>
+
+<div class="statement">
+  <strong>Key narrowing：</strong> 前端只送「當下選用的 image backend」的 credentials。選 A1111 時 OpenAI key 完全不離開瀏覽器。
+</div>
+
+---
+
 <div class="kicker">Observability</div>
 
 # 安全不是黑盒：每一次分類都可觀察
@@ -440,14 +512,14 @@ async with streamablehttp_client(
 
 <div class="two-col">
   <div class="panel tight">
-    <h3>Backend（<code>src/arcana/</code>）</h3>
+    <h3>Backend（依 concern 分群）</h3>
     <ul>
-      <li><code>app.py</code>：FastAPI factory + lifespan（http、mcp_pool、jobs）。</li>
-      <li><code>routes/</code>：reading / admin / mcp / health。</li>
-      <li><code>agent.py</code>：<code>TarotAgent</code> tool-use loop。</li>
-      <li><code>mcp_client.py</code>：<code>MCPSessionPool</code>（官方 SDK + AsyncExitStack）。</li>
-      <li><code>image_clients.py</code>：三種圖像 backend dispatcher。</li>
-      <li><code>guardrail.py</code>、<code>attack_log.py</code>、<code>tarot_data.py</code>、<code>prompts.py</code>。</li>
+      <li><code>app.py</code>、<code>config.py</code>：FastAPI factory、Settings。</li>
+      <li><code>core/</code>：<code>llm.py</code> AsyncOpenAI factory、<code>jobs.py</code> job store。</li>
+      <li><code>tarot/</code>：<code>cards / prompts / guardrail / agent / attack_log</code>。</li>
+      <li><code>images/clients.py</code>：三種 backend dispatcher。</li>
+      <li><code>tools/mcp.py</code>：<code>MCPSessionPool</code>（官方 SDK + AsyncExitStack）。</li>
+      <li><code>api/models.py</code> + <code>api/routes/</code>。</li>
     </ul>
   </div>
   <div class="panel tight">
