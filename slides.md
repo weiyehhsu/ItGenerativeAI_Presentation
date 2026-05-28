@@ -27,9 +27,9 @@ fonts:
       一個把 <strong>OpenAI-compatible LLM</strong>、<strong>LLM-as-Guardrail</strong>、
       <strong>SDXL 圖像生成</strong> 與即時管理面板整合在一起的互動式塔羅網站。
     </p>
-    <div class="mini repo-line">
+    <!--<div class="mini repo-line">
       Repo: <code>xingting1026/ItGenerativeAI_Presentation2</code>
-    </div>
+    </div>-->
   </div>
   <div class="panel">
     <div class="kicker panel-kicker">Team Members</div>
