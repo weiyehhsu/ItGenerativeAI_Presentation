@@ -336,11 +336,11 @@ def build_sdxl_prompt(card):
   </div>
   <div class="panel tight">
     <h3>可調參數（localStorage，無需重啟）</h3>
-    <ul>
-      <li><strong>Reading model：</strong>Base URL、API key、model ID、system prompt。</li>
-      <li><strong>Guard model：</strong>Base URL、API key、model ID。</li>
-      <li><strong>三種 Image Backend：</strong>A1111 / OpenAI <code>/images/generations</code> / OpenAI <code>/chat/completions</code> w/ <code>modalities</code>（Nano Banana 等）。</li>
-      <li><strong>MCP 工具：</strong>HTTP URL、auth header、逐工具勾選啟用。</li>
+    <ul style="line-height: 1.75;">
+      <li style="margin-bottom: 0.6em;"><strong>Reading Model：</strong>Base URL、API Key、Model ID、System Prompt。</li>
+      <li style="margin-bottom: 0.6em;"><strong>Guard Model：</strong>Base URL、API Key、Model ID。</li>
+      <li style="margin-bottom: 0.6em;"><strong>三種 Image Backend：</strong>A1111 / OpenAI <code>/images/generations</code> / OpenAI <code>/chat/completions</code> w/ <code>modalities</code>（Nano Banana 等）。</li>
+      <li><strong>MCP 工具：</strong>HTTP URL、Auth Header、逐工具勾選啟用。</li>
     </ul>
   </div>
 </div>
