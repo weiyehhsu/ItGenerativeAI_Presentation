@@ -242,28 +242,29 @@ drawn = random.sample(MAJOR_ARCANA, 3)
     <ul>
       <li>求問者生日</li>
       <li>使用者問題</li>
-      <li>三張牌的位置、中文名、英文名與關鍵字</li>
-      <li>可由進階模式覆寫的 system prompt</li>
+      <li>三張牌的位置、中英文名、<strong>正位/逆位</strong> 與對應關鍵字</li>
+      <li>可由進階模式覆寫的 system prompt（內含區分正逆位的指示）</li>
     </ul>
   </div>
   <div>
 
 ```txt
-請依以下結構解讀：
-1. 【整體脈絡】
-2. 【過去】
-3. 【現在】
-4. 【未來】
-5. 【塔羅師的建議】
+以三牌陣抽出的牌（含正逆位）：
+- 第 1 張【過去】: 愚者 (The Fool)【正位】
+  — 關鍵字: 新開始、純真、冒險、自由
+- 第 2 張【現在】: 高塔 (The Tower)【逆位】
+  — 關鍵字: 避免災難、延後變化、害怕改變
+- 第 3 張【未來】: 星星 (The Star)【正位】
+  — 關鍵字: 希望、靈感、平靜、療癒
 
-請直接開始解讀，不要說「好的」。
+解讀時務必明確區分每張牌是正位還是逆位。
 ```
 
   </div>
 </div>
 
 <div class="statement">
-  固定輸出格式讓模型的語氣仍然有彈性，但內容不會脫離塔羅解讀的結構。
+  每張牌 50/50 隨機正/逆位；逆位時 keywords 換成該牌的影子面，圖像在 UI 旋轉 180°，傳統塔羅做法。
 </div>
 
 ---
@@ -362,8 +363,8 @@ def build_sdxl_prompt(card):
   </div>
 </div>
 
-<div class="statement">
-  三種共用同一個 <code>generate_image(card, backend, opts, http)</code> dispatcher。Credentials fallback：<strong>UI 輸入 → <code>.env</code> 預設 → 寫死的安全預設</strong>。預選 backend 由 <code>ARCANA_DEFAULT_IMAGE_BACKEND</code> 決定，所以管理者可以做到「沒裝 SDXL 也一鍵 demo」。
+<div class="statement compact">
+  共用同一個 <code>generate_image()</code> dispatcher。Creds fallback：UI 輸入 → <code>.env</code> → 寫死預設。預選 backend 由 <code>ARCANA_DEFAULT_IMAGE_BACKEND</code> 決定，可做到「沒裝 SDXL 也一鍵 demo」。
 </div>
 
 ---
@@ -404,8 +405,8 @@ async with streamablehttp_client(
   </div>
 </div>
 
-<div class="statement">
-  Auth header 只存在使用者瀏覽器。工具勾選狀態與工具列表都即時持久化到 localStorage，重新整理頁面後立刻看到上次的工具，背景自動重新刷新。
+<div class="statement compact">
+  Auth header 不離開瀏覽器；工具列表與勾選狀態即時寫入 localStorage，重新整理立刻復原。
 </div>
 
 ---
@@ -537,8 +538,8 @@ async def scalar_html(request: Request):
   </div>
 </div>
 
-<div class="statement">
-  Flask 負責決策與狀態，Vanilla JS 負責把狀態轉成儀式感，兩邊的界線清楚。
+<div class="statement compact">
+  FastAPI 負責決策與狀態，Vanilla JS 負責把狀態轉成儀式感，兩邊界線清楚。
 </div>
 
 ---

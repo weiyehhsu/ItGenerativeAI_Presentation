@@ -275,10 +275,19 @@
   border-left: 3px solid var(--arcana-gold);
   background: rgba(7, 9, 26, 0.5);
   color: rgba(240, 227, 198, 0.9);
-  font-size: 0.98rem;
-  line-height: 1.55;
-  margin-top: 1rem;
-  padding: 0.72rem 0.86rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  margin-top: 0.6rem;
+  padding: 0.55rem 0.7rem;
+  /* prevent long CJK sentences from overflowing slide width */
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+/* tighter variant for slides that already have dense content above */
+.statement.compact {
+  font-size: 0.72rem;
+  padding: 0.45rem 0.6rem;
+  line-height: 1.4;
 }
 
 .api-grid {
