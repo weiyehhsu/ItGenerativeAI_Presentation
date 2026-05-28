@@ -103,23 +103,26 @@ fonts:
 
 ```mermaid
 flowchart LR
-  U["Browser<br/>index.html + main.js"] --> D["POST /api/draw<br/>birthday + question + settings"]
-  D --> G["Guardrail LLM<br/>guardrail.classify()"]
+  U["Browser<br/>index.html + main.js"] --> D["POST /api/draw<br/>birthday + question + settings + mcp_servers"]
+  D --> G["Guardrail LLM<br/>guardrail.classify (async)"]
   G -->|blocked| B["Seal UI"]
   G -->|crisis| C["Care Routing"]
-  G -->|clean| R["Reading LLM<br/>get_reading()"]
-  R --> J["job_id + cards + reading"]
-  J --> P["Background thread<br/>generate_images_bg()"]
-  P --> I["SDXL / Image API"]
+  G -->|clean| R["TarotAgent.run_reading<br/>tool-use loop"]
+  R <-->|MCP tool call| M["MCPSessionPool<br/>Streamable HTTP"]
+  R --> J["job_id + cards + reading + tool_trace"]
+  J --> P["asyncio.create_task<br/>_run_image_jobs"]
+  P --> I["A1111 / OpenAI images /<br/>OpenAI chat-image"]
   U --> Q["GET /api/image/{job}/{idx}<br/>polling"]
   D --> L["attack_log.jsonl"]
   L --> A["/admin dashboard"]
 ```
 
 <div class="tags">
-  <div class="arc-tag">Flask</div>
-  <div class="arc-tag">Vanilla JS</div>
+  <div class="arc-tag">FastAPI · async</div>
+  <div class="arc-tag">uv · Python 3.13</div>
   <div class="arc-tag">OpenAI-compatible API</div>
+  <div class="arc-tag">HTTP MCP (官方 SDK)</div>
+  <div class="arc-tag">Vanilla JS + Lucide</div>
   <div class="arc-tag">JSONL log</div>
 </div>
 
@@ -327,14 +330,80 @@ def build_sdxl_prompt(card):
     <img src="./assets/screenshots/arcana-advanced.png" class="shot screen-md" />
   </div>
   <div class="panel tight">
-    <h3>可調參數</h3>
+    <h3>可調參數（localStorage，無需重啟）</h3>
     <ul>
       <li>Reading model：base URL、API key、model ID、system prompt。</li>
       <li>Guard model：base URL、API key、model ID。</li>
-      <li>Image backend：A1111 SDXL 或 OpenAI-compatible image API。</li>
-      <li>SDXL checkpoint、steps、CFG scale。</li>
+      <li>三種 image backend：A1111 / OpenAI <code>/images/generations</code> / OpenAI <code>/chat/completions</code> w/ <code>modalities</code>（Nano Banana 等）。</li>
+      <li>MCP 工具：HTTP URL、auth header、逐工具勾選啟用。</li>
     </ul>
   </div>
+</div>
+
+---
+
+<div class="kicker">Image Backends</div>
+
+# 三種圖像 backend，同樣的介面
+
+<div class="cards cards-3">
+  <div class="panel">
+    <h3>A1111 SDXL</h3>
+    <p><code>/sdapi/v1/txt2img</code>。本地、可控、可掛 Lightning LoRA。支援 negative prompt 與 checkpoint 切換。</p>
+  </div>
+  <div class="panel">
+    <h3>OpenAI <code>/images/generations</code></h3>
+    <p>標準 OpenAI 圖像端點。預設 <code>gpt-image-1</code>。Azure / Together / Fireworks 同 schema。</p>
+  </div>
+  <div class="panel">
+    <h3>OpenAI <code>/chat/completions</code> w/ <code>modalities</code></h3>
+    <p>OpenRouter Nano Banana / Gemini 2.5 Flash Image 等。圖在 <code>choices[0].message.images[0].image_url.url</code>。</p>
+  </div>
+</div>
+
+<div class="statement">
+  三種共用同一個 <code>generate_image(card, backend, opts, http)</code> dispatcher，前端只需切換 radio。
+</div>
+
+---
+
+<div class="kicker">MCP Tool Use</div>
+
+# HTTP MCP：占卜師會自己呼叫工具
+
+<div class="two-col code-pair">
+  <div class="panel tight">
+    <h3>流程</h3>
+    <ol>
+      <li>使用者在「MCP 工具」介面新增 Streamable HTTP MCP 伺服器。</li>
+      <li>後端 <code>MCPSessionPool</code> 用官方 <code>mcp</code> SDK 建立並重用 session。</li>
+      <li><code>TarotAgent</code> 把啟用工具加入 chat-completions 的 <code>tools</code>。</li>
+      <li>模型回 <code>tool_calls</code> → 並行 <code>asyncio.gather</code> 呼叫 → 結果回填 → loop。</li>
+      <li>最多 5 輪，失敗自動降級為純文字解讀。</li>
+    </ol>
+  </div>
+  <div>
+
+```python
+from mcp import ClientSession
+from mcp.client.streamable_http import (
+    streamablehttp_client,
+)
+
+async with streamablehttp_client(
+    url, headers={"Authorization": auth},
+) as (r, w, _):
+    async with ClientSession(r, w) as s:
+        await s.initialize()
+        tools = (await s.list_tools()).tools
+        result = await s.call_tool(name, args)
+```
+
+  </div>
+</div>
+
+<div class="statement">
+  Auth header 只存在使用者瀏覽器，後端用 sha256 做 session pool key，不寫入磁碟。
 </div>
 
 ---
@@ -371,21 +440,23 @@ def build_sdxl_prompt(card):
 
 <div class="two-col">
   <div class="panel tight">
-    <h3>Backend</h3>
+    <h3>Backend（<code>src/arcana/</code>）</h3>
     <ul>
-      <li><code>app.py</code>：Flask routes、LLM client、image jobs。</li>
-      <li><code>guardrail.py</code>：八類安全分類與 fail-open。</li>
-      <li><code>attack_log.py</code>：in-memory deque + JSONL。</li>
-      <li><code>tarot_data.py</code>：Major Arcana 與 SDXL prompt。</li>
+      <li><code>app.py</code>：FastAPI factory + lifespan（http、mcp_pool、jobs）。</li>
+      <li><code>routes/</code>：reading / admin / mcp / health。</li>
+      <li><code>agent.py</code>：<code>TarotAgent</code> tool-use loop。</li>
+      <li><code>mcp_client.py</code>：<code>MCPSessionPool</code>（官方 SDK + AsyncExitStack）。</li>
+      <li><code>image_clients.py</code>：三種圖像 backend dispatcher。</li>
+      <li><code>guardrail.py</code>、<code>attack_log.py</code>、<code>tarot_data.py</code>、<code>prompts.py</code>。</li>
     </ul>
   </div>
   <div class="panel tight">
     <h3>Frontend</h3>
     <ul>
-      <li><code>templates/index.html</code>：塔羅 UI 與 advanced drawer。</li>
+      <li><code>templates/index.html</code>：塔羅 UI + advanced drawer + MCP drawer + Lucide icons。</li>
       <li><code>static/main.js</code>：抽牌流程、polling、lazy flip、封印與危機 UI。</li>
-      <li><code>templates/admin.html</code>：安全面板。</li>
-      <li><code>static/admin.js</code>：stats/recent polling 與 category bars。</li>
+      <li><code>static/mcp.js</code>：MCP 伺服器 CRUD、test、refresh、per-tool toggle。</li>
+      <li><code>templates/admin.html</code> + <code>admin.js</code>：安全面板。</li>
     </ul>
   </div>
 </div>
@@ -425,9 +496,21 @@ def build_sdxl_prompt(card):
     <strong>GET <code>/api/admin/recent</code></strong>
     <span>最近分類紀錄</span>
   </div>
-  <div class="api-card span-2">
+  <div class="api-card">
     <strong>POST <code>/api/admin/clear</code></strong>
-    <span>清空觀測資料，讓下一輪操作回到乾淨狀態</span>
+    <span>清空觀測資料</span>
+  </div>
+  <div class="api-card">
+    <strong>POST <code>/api/mcp/test</code></strong>
+    <span>連線 MCP 伺服器並回傳工具列表（前端 test/refresh 共用）</span>
+  </div>
+  <div class="api-card">
+    <strong>GET <code>/healthz</code></strong>
+    <span>FastAPI 健康檢查（含 SDXL 連線狀態）</span>
+  </div>
+  <div class="api-card">
+    <strong>GET <code>/docs</code></strong>
+    <span>FastAPI 自動產生的 OpenAPI 文件</span>
   </div>
 </div>
 
